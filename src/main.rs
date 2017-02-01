@@ -2,6 +2,20 @@ use std::fmt;
 
 fn main() {
 
+    enum Opt<T> {
+        None,
+        Some(T)
+    }
+
+    impl<T: fmt::Display> fmt::Display for Opt<T> {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match self {
+                &Opt::None => write!(f, "None"),
+                &Opt::Some(ref t) => write!(f, "Some({})", t)
+            }
+        }
+    }
+
     enum List <'a, T: 'a> {
         Nil,
         Cons { head: T, tail: &'a List<'a, T> } 
