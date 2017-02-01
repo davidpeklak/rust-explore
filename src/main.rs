@@ -16,30 +16,34 @@ fn main() {
         }
     }
 
-    enum List <'a, T: 'a> {
+    enum List <T> {
         Nil,
-        Cons { head: T, tail: &'a List<'a, T> } 
+        Cons(T, Box<List<T>>)
     }
 
-    impl<'a, T: fmt::Display> fmt::Display for List<'a, T> {
+    impl<T: fmt::Display> fmt::Display for List<T> {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             match self {
                 &List::Nil => write!(f, "Nil"),
-                &List::Cons{ head: ref h, tail: t } => {
+                &List::Cons(ref h, ref bt ) => {
                     write!(f, "{} :: ", h);
-                    t.fmt(f)
+                    bt.fmt(f)
                 }
             } 
         }
     }    
 
-    let n = List::Nil;
-    let n1 = List::Cons{head: 2, tail: &n};
+    macro_rules! List {
+        ($e1:expr, $e2:expr) => (List::Cons($e1, Box::new(List::Cons($e2, Box::new(List::Nil)))));      
+    }
+
+
+    let n1 = List!(3, 2);
 
     println!("The i32 List: {}", n1);
 
-    let s = List::Nil;
-    let s1 = List::Cons{head: "Hallo", tail: &s};
+    let s = Box::new(List::Nil);
+    let s1 = List::Cons("Hallo", s);;
 
     println!("The str List: {}", s1);
 }
