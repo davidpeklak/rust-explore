@@ -34,17 +34,17 @@ fn main() {
     }    
 
     macro_rules! List {
-        ($e1:expr, $e2:expr) => (List::Cons($e1, Box::new(List::Cons($e2, Box::new(List::Nil)))));      
+        ( $( $x:expr ),* )  => {{
+            let mut tmp_list = List::Nil;
+            $(
+                tmp_list = List::Cons($x, Box::new(tmp_list)); 
+            )*
+            tmp_list            
+        }}      
     }
 
-
-    let n1 = List!(3, 2);
+    let n1 = List!(2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
 
     println!("The i32 List: {}", n1);
-
-    let s = Box::new(List::Nil);
-    let s1 = List::Cons("Hallo", s);;
-
-    println!("The str List: {}", s1);
 }
 
