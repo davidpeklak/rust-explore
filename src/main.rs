@@ -2,6 +2,10 @@ use std::fmt;
 
 fn main() {
 
+   trait Foo {
+       fn to_a_string(&self) -> String;
+   }
+
     enum Opt<T> {
         None,
         Some(T)
@@ -16,6 +20,15 @@ fn main() {
         }
     }
 
+    impl<T: fmt::Display> Foo for Opt<T> {
+        fn to_a_string(&self) -> String {
+            match self {
+                &Opt::None => "None".to_string(),
+                &Opt::Some(ref t) => format!("Some({})", t) 
+            }
+        }
+    }
+
     enum List <T> {
         Nil,
         Cons(T, Box<List<T>>)
@@ -26,8 +39,8 @@ fn main() {
             match self {
                 &List::Nil => write!(f, "Nil"),
                 &List::Cons(ref h, ref bt ) => {
-                    write!(f, "{} :: ", h);
-                    bt.fmt(f)
+                    write!(f, "{} :: ", h)
+                        .and(bt.fmt(f))
                 }
             } 
         }
@@ -46,5 +59,13 @@ fn main() {
     let n1 = List!(2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
 
     println!("The i32 List: {}", n1);
+
+    let o1 = Opt::Some(3);
+
+    println!("The Option: {}", o1);
+
+    let o2: Opt<i32>  = Opt::None;
+
+    println!("The other Option: {}", o2);
 }
 
