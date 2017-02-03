@@ -44,7 +44,19 @@ fn main() {
                 }
             } 
         }
-    }    
+    } 
+
+    impl<T: fmt::Display> Foo for List<T> {
+        fn to_a_string(&self) -> String {
+            match self {
+                &List::Nil => "Nil".to_string(),
+                &List::Cons(ref h, ref bt ) => {
+                    format!("{} :: {}", h, bt.to_a_string())
+                }
+            }
+        }
+    }
+         
 
     macro_rules! List {
         ( $( $x:expr ),* )  => {{
@@ -58,14 +70,14 @@ fn main() {
 
     let n1 = List!(2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
 
-    println!("The i32 List: {}", n1);
+    println!("The i32 List: {}", n1.to_a_string());
 
     let o1 = Opt::Some(3);
 
-    println!("The Option: {}", o1);
+    println!("The Option: {}", o1.to_a_string());
 
     let o2: Opt<i32>  = Opt::None;
 
-    println!("The other Option: {}", o2);
+    println!("The other Option: {}", o2.to_a_string());
 }
 
