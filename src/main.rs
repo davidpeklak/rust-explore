@@ -68,16 +68,22 @@ fn main() {
         }}      
     }
 
+    fn stat_dispatch<T: Foo>(t: T) {
+        println!("{}", t.to_a_string())
+    }
+
     let n1 = List!(2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
 
-    println!("The i32 List: {}", n1.to_a_string());
+    stat_dispatch(n1);
 
     let o1 = Opt::Some(3);
 
-    println!("The Option: {}", o1.to_a_string());
+    stat_dispatch(o1);
 
     let o2: Opt<i32>  = Opt::None;
 
-    println!("The other Option: {}", o2.to_a_string());
+    stat_dispatch(o2);
+
+
 }
 
