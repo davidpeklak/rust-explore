@@ -1,19 +1,9 @@
+#[macro_use]
 extern crate explore;
 
 use explore::core::{Foo, Opt, List};
 
 fn main() {
-
-    macro_rules! List {
-        ( $( $x:expr ),* )  => {{
-            let mut tmp_list = List::Nil;
-            $(
-                tmp_list = List::Cons($x, Box::new(tmp_list)); 
-            )*
-            tmp_list            
-        }}      
-    }
-
     fn stat_dispatch<T: Foo>(t: &T) {
         println!("stat: {}", t.to_a_string())
     }

@@ -54,3 +54,14 @@ impl<T: fmt::Display> Foo for List<T> {
         }
     }
 }
+
+#[macro_export]
+macro_rules! List {
+        ( $( $x:expr ),* )  => {{
+            let mut tmp_list = List::Nil;
+            $(
+                tmp_list = List::Cons($x, Box::new(tmp_list));
+            )*
+            tmp_list
+        }}
+    }
