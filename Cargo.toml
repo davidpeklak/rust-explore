@@ -3,4 +3,12 @@ name = "rust-explore"
 version = "0.1.0"
 authors = ["David Peklak <dpeklak@gmail.com>"]
 
+[lib]
+name = "explore"
+path = "src/explore/lib.rs"
+
+[[bin]]
+name = "explore"
+path = "src/bin/main.rs"
+
 [dependencies]
