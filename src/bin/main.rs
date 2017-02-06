@@ -2,6 +2,7 @@
 extern crate explore;
 
 use explore::core::{Foo, Opt, List};
+use explore::functor::StatFunctor;
 
 fn main() {
 
@@ -20,6 +21,11 @@ fn main() {
 
     stat_dispatch(&o2);
     dyn_dispatch(&o2);
+
+    let o3: Opt<i32> = o1.map(|x| x + 2);
+
+    stat_dispatch(&o3);
+    dyn_dispatch(&o3);
 
 }
 
