@@ -4,13 +4,7 @@ extern crate explore;
 use explore::core::{Foo, Opt, List};
 
 fn main() {
-    fn stat_dispatch<T: Foo>(t: &T) {
-        println!("stat: {}", t.to_a_string())
-    }
 
-    fn dyn_dispatch(t: &Foo) {
-        println!("dyn: {}", t.to_a_string())
-    }
 
     let n1 = List!(2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
 
@@ -29,3 +23,10 @@ fn main() {
 
 }
 
+fn stat_dispatch<T: Foo>(t: &T) {
+    println!("stat: {}", t.to_a_string())
+}
+
+fn dyn_dispatch(t: &Foo) {
+    println!("dyn: {}", t.to_a_string())
+}
