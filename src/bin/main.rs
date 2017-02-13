@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate explore;
+extern crate byteorder;
 
 use explore::core::{Foo, Opt, List};
 use explore::functor::StatFunctor;
@@ -11,6 +12,8 @@ fn main() {
 
     stat_dispatch(&n1);
     dyn_dispatch(&n1);
+    write_to_file(&n1);
+    read_from_file();
 
     let o1 = Opt::Some(3);
 
@@ -27,6 +30,8 @@ fn main() {
     stat_dispatch(&o3);
     dyn_dispatch(&o3);
 
+
+
 }
 
 fn stat_dispatch<T: Foo>(t: &T) {
@@ -35,4 +40,37 @@ fn stat_dispatch<T: Foo>(t: &T) {
 
 fn dyn_dispatch(t: &Foo) {
     println!("dyn: {}", t.to_a_string())
+}
+
+fn write_to_file<T: Foo>(t: &T) {
+    use std::io::prelude::*;
+    use std::fs::File;
+    use byteorder::{ByteOrder, BigEndian};
+
+    let bytes = t.to_a_string();
+    let length = bytes.len() as u32;
+    let mut ba = [0u8; 4];
+    BigEndian::write_u32(&mut ba, length);
+
+    let mut f = File::create("target/foo.txt").unwrap();
+
+    println!("write length: {}", length);
+
+    f.write_all(&ba).unwrap();
+    f.write_all(t.to_a_string().as_bytes()).unwrap();
+}
+
+fn read_from_file()  {
+    use std::fs::File;
+    use std::io::Read;
+    use byteorder::{ByteOrder, BigEndian};
+
+    let mut f = File::open("target/foo.txt").unwrap();
+
+    let mut ba = [0u8; 4];
+    f.read_exact(&mut ba).unwrap();
+
+    let length = BigEndian::read_u32(&mut ba) as usize;
+
+    println!("read length: {}", length);
 }

@@ -8,7 +8,8 @@ name = "explore"
 path = "src/explore/lib.rs"
 
 [[bin]]
-name = "explore"
+name = "main"
 path = "src/bin/main.rs"
 
 [dependencies]
+byteorder = "1"
