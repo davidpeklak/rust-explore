@@ -2,62 +2,44 @@
 extern crate explore;
 extern crate byteorder;
 
-use explore::core::{Foo, Opt, List};
-use explore::functor::StatFunctor;
+use std::io;
+use std::fs::File;
 
 fn main() {
 
+    let mut file = File::create("target/foo.txt")
+        .expect("Could not open file");
 
-    let n1 = List!(2, 3, 5, 8, 13, 21, 34, 55, 89, 144);
+    loop {
+        println!("Enter a message");
 
-    stat_dispatch(&n1);
-    dyn_dispatch(&n1);
-    write_to_file(&n1);
-    read_from_file();
+        let mut input = String::new();
 
-    let o1 = Opt::Some(3);
+        io::stdin().read_line(&mut input)
+            .expect("Failed to read line");
 
-    stat_dispatch(&o1);
-    dyn_dispatch(&o1);
+        if input.trim().len() == 0 {
+            break;
+        }
 
-    let o2: Opt<i32>  = Opt::None;
-
-    stat_dispatch(&o2);
-    dyn_dispatch(&o2);
-
-    let o3: Opt<i32> = o1.map(|x| x + 2);
-
-    stat_dispatch(&o3);
-    dyn_dispatch(&o3);
-
-
+        write_to_file(&mut file, &mut input)
+    }
 
 }
 
-fn stat_dispatch<T: Foo>(t: &T) {
-    println!("stat: {}", t.to_a_string())
-}
-
-fn dyn_dispatch(t: &Foo) {
-    println!("dyn: {}", t.to_a_string())
-}
-
-fn write_to_file<T: Foo>(t: &T) {
+fn write_to_file(file: &mut File, msg: &str) {
     use std::io::prelude::*;
-    use std::fs::File;
     use byteorder::{ByteOrder, BigEndian};
 
-    let bytes = t.to_a_string();
+    let bytes = msg.as_bytes();
     let length = bytes.len() as u32;
     let mut ba = [0u8; 4];
     BigEndian::write_u32(&mut ba, length);
 
-    let mut f = File::create("target/foo.txt").unwrap();
-
     println!("write length: {}", length);
 
-    f.write_all(&ba).unwrap();
-    f.write_all(t.to_a_string().as_bytes()).unwrap();
+    file.write_all(&ba).unwrap();
+    file.write_all(msg.as_bytes()).unwrap();
 }
 
 fn read_from_file() -> String {
