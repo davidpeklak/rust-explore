@@ -1,78 +1,59 @@
-#[macro_use]
 extern crate explore;
-extern crate byteorder;
 
-use std::io;
-use std::fs::File;
+use std::{io, thread};
+use explore::core::Store;
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
+
+fn read(s: &Store) {
+    loop {
+        println!("Enter 'max' to get maximum index, enter an index to get the referenced message");
+
+        let mut input = String::new();
+
+        io::stdin().read_line(&mut input)
+            .expect("Failed to read line");
+
+        let trimmed_input = input.trim();
+
+        if trimmed_input.len() == 0 {
+            break;
+        }
+
+        if trimmed_input == "max" {
+            println!("max is {}", s.max());
+        } else {
+            let i: usize = trimmed_input
+                .parse()
+                .expect("expected a number");
+
+            match s.read(i) {
+                Some(s) => println!("{}: {}", i, s),
+                None => println!("{}: None", i)
+            }
+        }
+    }
+}
+
+fn grow(s: & mut Store) {
+    loop {
+        s.write("vier".to_string());
+        thread::sleep(Duration::from_millis(2000));
+    }
+}
 
 fn main() {
-    {
-        let mut file = File::create("target/foo.txt")
-            .expect("Could not open file");
+    let store = Arc::new(Mutex::new(vec!["ans".to_string(), "zwa".to_string(), "drei".to_string()]));
 
-        loop {
-            println!("Enter a message");
+    let mut store_1 = store
+        .clone();
 
-            let mut input = String::new();
+    thread::spawn(move || {
+        grow(&mut store_1);
+    });
 
-            io::stdin().read_line(&mut input)
-                .expect("Failed to read line");
+    read(&store);
 
-            let trimmed_input = input.trim();
-
-            if trimmed_input.len() == 0 {
-                break;
-            }
-
-            write_to_file(&mut file, &trimmed_input)
-        }
-    }
-    {
-        let mut file = File::open("target/foo.txt").unwrap();
-
-        loop {
-            let msg = read_from_file(&mut file);
-            println!("{}", msg);
-        }
-    }
 }
 
-fn write_to_file(file: &mut File, msg: &str) {
-    use std::io::prelude::*;
-    use byteorder::{ByteOrder, BigEndian};
 
-    let bytes = msg.as_bytes();
-    let length = bytes.len() as u32;
-    let mut ba = [0u8; 4];
-    BigEndian::write_u32(&mut ba, length);
-
-    println!("write length: {}", length);
-
-    file.write_all(&ba)
-        .expect("Could not right message length to file");
-    file.write_all(msg.as_bytes())
-        .expect("Could not right message to file");
-}
-
-fn read_from_file(file: &mut File) -> String {
-    use std::io::Read;
-    use std::str::from_utf8;
-    use byteorder::{ByteOrder, BigEndian};
-
-    let mut ba = [0u8; 4];
-    file.read_exact(&mut ba)
-        .expect("Could not read message length from file");
-
-    let length = BigEndian::read_u32(&mut ba) as usize;
-    println!("read length: {}", length);
-
-    let mut buf = vec![0; length].into_boxed_slice();
-    file.read_exact(&mut buf)
-        .expect("Could not read message from file");
-
-    let s = from_utf8(&buf).unwrap();
-
-    println!("read {}", s);
-
-    s.to_string()
-}
