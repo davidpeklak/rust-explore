@@ -13,3 +13,4 @@ path = "src/bin/main.rs"
 
 [dependencies]
 byteorder = "1"
+hyper = "0.10"

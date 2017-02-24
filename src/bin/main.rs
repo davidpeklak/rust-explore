@@ -1,9 +1,11 @@
 extern crate explore;
+extern crate hyper;
 
+use hyper::server::{Handler, Server, Request, Response};
 use std::{io, thread};
+use std::io::Read;
 use explore::core::Store;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
 
 fn read(s: &Store) {
     loop {
@@ -35,22 +37,56 @@ fn read(s: &Store) {
     }
 }
 
-fn grow(s: & mut Store) {
-    loop {
-        s.write("vier".to_string());
-        thread::sleep(Duration::from_millis(2000));
+fn handle_post(s: &mut Store, mut req: Request, res: Response) {
+    {
+        println!("Received a request:");
+        let method = &req.method;
+        println!("Method: {}", method);
+        let headers = &req.headers;
+        println!("Headers: {}", headers);
+        let uri = &req.uri;
+        println!("uri: {}", uri);
     }
+
+    let mut buffer = String::new();
+    req.read_to_string(&mut buffer)
+        .expect("failed to read to string");
+
+    println!("Adding message: {}", buffer);
+    let nr = s.write(buffer);
+    println!("Added message as number {}", nr);
 }
 
 fn main() {
     let store = Arc::new(Mutex::new(vec!["ans".to_string(), "zwa".to_string(), "drei".to_string()]));
 
-    let mut store_1 = store
+    let store_1 = store
         .clone();
 
+    struct StoreWrap {
+        store: Arc<Mutex<Vec<String>>>
+    }
+
+    impl Handler for StoreWrap {
+        fn handle(&self, req: Request, res: Response) {
+            let mut store_1 = self
+                .store
+                .clone();
+            handle_post(&mut store_1, req, res);
+        }
+    }
+
+    println!("Initializing server...");
+    let server = Server::http("localhost:8080")
+        .expect("Failed to initialize server");
+
     thread::spawn(move || {
-        grow(&mut store_1);
+        server
+            .handle(StoreWrap{store: store_1})
+            .expect("Failed to handle");
     });
+
+    println!("Server initialized");
 
     read(&store);
 
