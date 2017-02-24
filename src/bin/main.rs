@@ -37,24 +37,30 @@ fn read(s: &Store) {
     }
 }
 
-fn handle_post(s: &mut Store, mut req: Request, res: Response) {
-    {
-        println!("Received a request:");
-        let method = &req.method;
-        println!("Method: {}", method);
-        let headers = &req.headers;
-        println!("Headers: {}", headers);
-        let uri = &req.uri;
-        println!("uri: {}", uri);
+struct StoreWrap<T: Store> {
+    store: T
+}
+
+impl Handler for StoreWrap<Arc<Mutex<Vec<String>>>> {
+    fn handle(&self, mut req: Request, res: Response) {
+        {
+            println!("Received a request:");
+            let method = &req.method;
+            println!("Method: {}", method);
+            let headers = &req.headers;
+            println!("Headers: {}", headers);
+            let uri = &req.uri;
+            println!("uri: {}", uri);
+        }
+
+        let mut buffer = String::new();
+        req.read_to_string(&mut buffer)
+            .expect("failed to read to string");
+
+        println!("Adding message: {}", buffer);
+        let nr = self.store.clone().write(buffer);
+        println!("Added message as number {}", nr);
     }
-
-    let mut buffer = String::new();
-    req.read_to_string(&mut buffer)
-        .expect("failed to read to string");
-
-    println!("Adding message: {}", buffer);
-    let nr = s.write(buffer);
-    println!("Added message as number {}", nr);
 }
 
 fn main() {
@@ -63,33 +69,19 @@ fn main() {
     let store_1 = store
         .clone();
 
-    struct StoreWrap {
-        store: Arc<Mutex<Vec<String>>>
-    }
-
-    impl Handler for StoreWrap {
-        fn handle(&self, req: Request, res: Response) {
-            let mut store_1 = self
-                .store
-                .clone();
-            handle_post(&mut store_1, req, res);
-        }
-    }
-
     println!("Initializing server...");
     let server = Server::http("localhost:8080")
         .expect("Failed to initialize server");
 
     thread::spawn(move || {
         server
-            .handle(StoreWrap{store: store_1})
+            .handle(StoreWrap { store: store_1 })
             .expect("Failed to handle");
     });
 
     println!("Server initialized");
 
     read(&store);
-
 }
 
 
