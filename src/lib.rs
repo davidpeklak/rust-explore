@@ -1,4 +1,5 @@
 
-pub struct Future<T> {
-    pub fun: Fn() -> T
+pub struct Future<T, F>
+    where F: Fn() -> T {
+    pub fun: F
 }
