@@ -1,5 +1,7 @@
 extern crate futexp;
 
+use futexp::*;
+
 fn main() {
-    println!("Hello, future!");
+    let fut = Future { fun: || 3 };
 }
