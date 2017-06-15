@@ -4,12 +4,14 @@ pub struct Future<T, F>
     pub fun: F
 }
 
-pub struct Map {}
+pub struct Map<M> {
+    pub mf: M
+}
 
 impl<T, F> Future<T, F>
     where F: Fn() -> T {
-    pub fn map<U, M>(&self, mf: M) -> Map
+    pub fn map<U, M>(&self, mf: M) -> Map<M>
         where M: Fn(T) -> U {
-        Map {}
+        Map { mf: mf }
     }
 }
