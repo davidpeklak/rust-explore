@@ -16,3 +16,12 @@ impl<T, F> Future<T, F>
         Map { fut: self, mf: mf }
     }
 }
+
+impl<T, F, M, U> Map<Future<T, F>, M>
+    where F: Fn() -> T,
+          M: Fn(T) -> U {
+    pub fn map<V, N>(self, mf: N) -> Map<Self, N>
+        where N: Fn(U) -> V {
+        Map { fut: self, mf: mf }
+    }
+}
