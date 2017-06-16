@@ -25,3 +25,13 @@ impl<T, F, M, U> Map<Future<T, F>, M>
         Map { fut: self, mf: mf }
     }
 }
+
+impl<T, F, M, U, V, N> Map<Map<Future<T, F>, M>, N>
+    where F: Fn() -> T,
+          M: Fn(T) -> U,
+          N: Fn(U) -> V {
+    pub fn map<W, O>(self, mf: O) -> Map<Self, O>
+        where O: Fn(V) -> W {
+        Map { fut: self, mf: mf }
+    }
+}
