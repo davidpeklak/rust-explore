@@ -1,3 +1,7 @@
+pub trait Future<T> {
+    fn map<U, M>(self, mf: M) -> Map<Self, M>
+        where M: Fn(T) -> U;
+}
 
 pub struct FutureImpl<T, F>
     where F: Fn() -> T {
