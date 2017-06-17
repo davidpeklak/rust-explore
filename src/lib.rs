@@ -1,5 +1,5 @@
 
-pub struct Future<T, F>
+pub struct FutureImpl<T, F>
     where F: Fn() -> T {
     pub fun: F
 }
@@ -9,7 +9,7 @@ pub struct Map<F, M> {
     pub mf: M
 }
 
-impl<T, F> Future<T, F>
+impl<T, F> FutureImpl<T, F>
     where F: Fn() -> T {
     pub fn map<U, M>(self, mf: M) -> Map<Self, M>
         where M: Fn(T) -> U {
@@ -17,7 +17,7 @@ impl<T, F> Future<T, F>
     }
 }
 
-impl<T, F, M, U> Map<Future<T, F>, M>
+impl<T, F, M, U> Map<FutureImpl<T, F>, M>
     where F: Fn() -> T,
           M: Fn(T) -> U {
     pub fn map<V, N>(self, mf: N) -> Map<Self, N>
