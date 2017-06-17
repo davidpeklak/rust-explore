@@ -16,18 +16,18 @@ pub struct Map<F, M> {
     pub mf: M
 }
 
-impl<T, F> FutureImpl<T, F>
+impl<T, F> Future<T> for FutureImpl<T, F>
     where F: Fn() -> T {
-    pub fn map<U, M>(self, mf: M) -> Map<Self, M>
+    fn map<U, M>(self, mf: M) -> Map<Self, M>
         where M: Fn(T) -> U {
         Map { fut: self, mf: mf }
     }
 }
 
-impl<T, F, M, U> Map<FutureImpl<T, F>, M>
+impl<T, F, M, U> Future<U> for Map<FutureImpl<T, F>, M>
     where F: Fn() -> T,
           M: Fn(T) -> U {
-    pub fn map<V, N>(self, mf: N) -> Map<Self, N>
+    fn map<V, N>(self, mf: N) -> Map<Self, N>
         where N: Fn(U) -> V {
         Map { fut: self, mf: mf }
     }
