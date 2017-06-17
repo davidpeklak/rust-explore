@@ -1,4 +1,7 @@
-pub trait Future<T> {
+use std::marker::Sized;
+
+pub trait Future<T>
+where Self: Sized {
     fn map<U, M>(self, mf: M) -> Map<Self, M>
         where M: Fn(T) -> U;
 }
