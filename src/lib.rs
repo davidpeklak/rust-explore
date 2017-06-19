@@ -4,7 +4,9 @@ pub trait Future
     where Self: Sized {
     type T;
     fn map<U, M>(self, mf: M) -> Map<Self, M>
-        where M: Fn(Self::T) -> U;
+        where M: Fn(Self::T) -> U {
+        Map { fut: self, mf: mf }
+    }
 }
 
 pub struct FutureImpl<F> {
@@ -19,18 +21,10 @@ pub struct Map<F, M> {
 impl<T, F> Future for FutureImpl<F>
     where F: Fn() -> T {
     type T = T;
-    fn map<U, M>(self, mf: M) -> Map<Self, M>
-        where M: Fn(T) -> U {
-        Map { fut: self, mf: mf }
-    }
 }
 
 impl<T, F, M, U> Future for Map<F, M>
     where F: Future<T=T>,
           M: Fn(T) -> U {
     type T = U;
-    fn map<V, N>(self, mf: N) -> Map<Self, N>
-        where N: Fn(U) -> V {
-        Map { fut: self, mf: mf }
-    }
 }
