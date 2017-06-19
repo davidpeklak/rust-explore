@@ -24,8 +24,8 @@ impl<T, F> Future<T> for FutureImpl<T, F>
     }
 }
 
-impl<T, F, M, U> Future<U> for Map<FutureImpl<T, F>, M>
-    where F: Fn() -> T,
+impl<T, F, M, U> Future<U> for Map<F, M>
+    where F: Future<T>,
           M: Fn(T) -> U {
     fn map<V, N>(self, mf: N) -> Map<Self, N>
         where N: Fn(U) -> V {
