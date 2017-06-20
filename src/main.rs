@@ -1,6 +1,6 @@
 extern crate futexp;
 
-use futexp::*;
+use futexp::future::*;
 
 fn main() {
     let fut = FutureImpl { fun: || 3 };
