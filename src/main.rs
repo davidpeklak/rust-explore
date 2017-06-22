@@ -8,8 +8,7 @@ fn main() {
     let fut = fut.map(|x| x + 2);
     let fut = fut.map(|x| x * 2);
     let fut = fut.map(|x| x - 3);
-
-    let fut = future(|| {println!("Yes!")});
+    let fut = fut.map(|x| { println!("x is {}", x) });
 
     fut.run_sync();
     fut.run_sync();
